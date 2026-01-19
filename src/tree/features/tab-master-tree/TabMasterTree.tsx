@@ -1,5 +1,5 @@
-import { onMessage } from '@garinz/webext-bridge';
 import React, { useContext, useEffect, useState } from 'react';
+import browser from 'webextension-polyfill';
 
 import { SettingContext } from '../../context';
 import registerShortcuts from '../shortcuts/shortcuts';
@@ -11,47 +11,48 @@ import type { TreeData, TreeNode } from './nodes/nodes';
 import './style.less';
 
 const registerBrowserEventHandlers = (tmTree: FancyTabMasterTree) => {
-    onMessage('add-tab', (msg) => {
-        tmTree.createTab(msg.data);
+    // Listen for messages from background script using native browser API
+    browser.runtime.onMessage.addListener((message: any) => {
+        if (!message || !message.type) return;
+        
+        switch (message.type) {
+            case 'add-tab':
+                tmTree.createTab(message.data);
+                break;
+            case 'remove-tab':
+                tmTree.removeTab(message.data.tabId);
+                break;
+            case 'remove-window':
+                tmTree.removeWindow(message.data.windowId);
+                break;
+            case 'move-tab':
+                const { windowId, fromIndex, toIndex, tabId } = message.data;
+                tmTree.moveTab(windowId, tabId, fromIndex, toIndex);
+                break;
+            case 'update-tab':
+                tmTree.updateTab(message.data);
+                break;
+            case 'activated-tab':
+                tmTree.activeTab(message.data.windowId, message.data.tabId);
+                break;
+            case 'attach-tab':
+                tmTree.attachTab(message.data.windowId, message.data.tabId, message.data.newIndex);
+                break;
+            case 'detach-tab':
+                tmTree.detachTab(message.data.tabId);
+                break;
+            case 'window-focus':
+                tmTree.windowFocus(message.data.windowId);
+                break;
+            case 'add-window':
+                tmTree.createWindow(message.data);
+                break;
+            case 'replace-tab':
+                tmTree.replaceTab(message.data.addedTabId, message.data.removedTabId);
+                break;
+        }
     });
-    onMessage('remove-tab', (msg) => {
-        const { tabId } = msg.data;
-        tmTree.removeTab(tabId);
-    });
-    onMessage('remove-window', (msg) => {
-        tmTree.removeWindow(msg.data.windowId);
-    });
-    onMessage('move-tab', async (msg) => {
-        const { windowId, fromIndex, toIndex, tabId } = msg.data;
-        // 2. 移动元素
-        tmTree.moveTab(windowId, tabId, fromIndex, toIndex);
-    });
-    onMessage('update-tab', (msg) => {
-        tmTree.updateTab(msg.data);
-    });
-    onMessage('activated-tab', (msg) => {
-        const { windowId, tabId } = msg.data;
-        tmTree.activeTab(windowId, tabId);
-    });
-    onMessage('attach-tab', (msg) => {
-        const { tabId, windowId, newIndex } = msg.data;
-        tmTree.attachTab(windowId, tabId, newIndex);
-    });
-    onMessage('detach-tab', (msg) => {
-        const { tabId } = msg.data;
-        tmTree.detachTab(tabId);
-    });
-    onMessage('window-focus', (msg) => {
-        const { windowId } = msg.data;
-        tmTree.windowFocus(windowId);
-    });
-    onMessage('add-window', (msg) => {
-        tmTree.createWindow(msg.data);
-    });
-    onMessage('replace-tab', (msg) => {
-        const { addedTabId, removedTabId } = msg.data;
-        tmTree.replaceTab(addedTabId, removedTabId);
-    });
+    
     registerShortcuts(tmTree);
 };
 

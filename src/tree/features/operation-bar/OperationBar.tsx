@@ -30,7 +30,9 @@ const TYPE_KEYWORDS: Record<string, string[]> = {
     'Video & Streaming': ['youtube', 'netflix', 'tiktok', 'vimeo', 'twitch', 'disney', 'hbo'],
     'Social Media': ['facebook', 'instagram', 'twitter', 'x.com', 'linkedin', 'reddit', 'pinterest'],
     'Shopping': ['amazon', 'shopee', 'lazada', 'ebay', 'aliexpress'],
-    'Development': ['github', 'gitlab', 'stackoverflow', 'localhost', '127.0.0.1']
+    'Development': ['github', 'gitlab', 'stackoverflow', 'localhost', '127.0.0.1'],
+    'Chinese Apps': ['douyin', 'xiaohongshu', 'kuaishou', 'xhslink', 'wechat', 'weibo'],
+    'Design': ['canva', 'figma', 'dribbble', 'behance', 'adobe']
 };
 
 const COMPANY_KEYWORDS: Record<string, string[]> = {
@@ -135,6 +137,10 @@ const DOMAIN_FRIENDLY_NAMES: Record<string, { name: string; color: string }> = {
     'dropbox.com': { name: '📦 Dropbox', color: 'blue' },
     'onedrive.live.com': { name: '☁️ OneDrive', color: 'blue' },
     'icloud.com': { name: '☁️ iCloud', color: 'grey' },
+
+    // Chinese Platforms
+    'xiaohongshu.com': { name: '💖 Xiaohongshu ', color: 'red' },
+    'douyin.com': { name: '🥷🏻 Douyin抖音 ', color: 'grey' },
 };
 
 // Get friendly name for domain
@@ -456,7 +462,9 @@ const OperationBar: React.FC = () => {
             'Video & Streaming': 'red',
             'Social Media': 'blue',
             'Shopping': 'orange',
-            'Development': 'grey'
+            'Development': 'grey',
+            'Chinese Apps': 'pink',
+            'Design': 'purple'
         };
 
         tabs.forEach((tab) => {
@@ -469,7 +477,9 @@ const OperationBar: React.FC = () => {
                                      type === 'Video & Streaming' ? '🎬' :
                                      type === 'Social Media' ? '👥' :
                                      type === 'Shopping' ? '🛒' :
-                                     type === 'Development' ? '💻' : '📁';
+                                     type === 'Development' ? '💻' :
+                                     type === 'Chinese Apps' ? '🇨🇳' :
+                                     type === 'Design' ? '🎨' : '📁';
                         const groupName = `${emoji} ${type}`;
                         if (!groups[groupName]) {
                             groups[groupName] = { tabIds: [], color: TYPE_COLORS[type] || 'grey' };
