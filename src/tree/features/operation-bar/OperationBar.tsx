@@ -9,7 +9,9 @@ import {
     CalendarOutlined,
     GlobalOutlined,
     AppstoreOutlined,
-    BankOutlined
+    BankOutlined,
+    MergeCellsOutlined,
+    SplitCellsOutlined
 } from '@ant-design/icons';
 import { message, Popover, Tooltip } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
@@ -26,13 +28,19 @@ import './operation-bar.less';
 
 
 const TYPE_KEYWORDS: Record<string, string[]> = {
-    'AI Tools': ['chatgpt', 'claude', 'gemini', 'deepseek', 'openai', 'midjourney', 'bard', 'bing'],
-    'Video & Streaming': ['youtube', 'netflix', 'tiktok', 'vimeo', 'twitch', 'disney', 'hbo'],
-    'Social Media': ['facebook', 'instagram', 'twitter', 'x.com', 'linkedin', 'reddit', 'pinterest'],
-    'Shopping': ['amazon', 'shopee', 'lazada', 'ebay', 'aliexpress'],
-    'Development': ['github', 'gitlab', 'stackoverflow', 'localhost', '127.0.0.1'],
-    'Chinese Apps': ['douyin', 'xiaohongshu', 'kuaishou', 'xhslink', 'wechat', 'weibo'],
-    'Design': ['canva', 'figma', 'dribbble', 'behance', 'adobe']
+    'AI Tools': ['chatgpt', 'claude', 'gemini', 'deepseek', 'openai', 'midjourney', 'bard', 'bing', 'klingai', 'perplexity', 'poe', 'character.ai', 'replika', 'jasper', 'writesonic', 'copilot', 'notion.ai', 'anthropic', 'stability.ai', 'huggingface', 'runway', 'leonardo.ai', 'grok', 'aistudio', 'suno'],
+    'Video & Streaming': ['youtube', 'netflix', 'tiktok', 'vimeo', 'twitch', 'disney', 'hbo', 'prime video', 'hulu', 'dailymotion', 'bilibili', 'viu', 'iqiyi', 'crunchyroll', 'peacock', 'paramount'],
+    'Social Media': ['facebook', 'instagram', 'twitter', 'x.com', 'linkedin', 'reddit', 'pinterest', 'snapchat', 'telegram', 'whatsapp', 'discord', 'mastodon', 'threads', 'bluesky', 'tumblr', 'line'],
+    'Shopping': ['amazon', 'shopee', 'lazada', 'ebay', 'aliexpress', 'taobao', 'jd.com', 'walmart', 'tokopedia', 'mercari', 'etsy', 'shein', 'temu', 'rakuten'],
+    'Development': ['github', 'gitlab', 'stackoverflow', 'localhost', '127.0.0.1', 'vercel', 'netlify', 'heroku', 'aws', 'azure', 'digitalocean', 'codepen', 'codesandbox', 'replit', 'glitch', 'jsfiddle', 'npm', 'docker', 'aimlapi', 'aimlapi.com', 'phaya', 'phaya.io'],
+    'Chinese Apps': ['douyin', 'xiaohongshu', 'kuaishou', 'xhslink', 'wechat', 'weibo', 'zhihu', 'baidu', 'bilibili', 'meituan', 'dianping', 'ele.me', 'pinduoduo'],
+    'Design': ['canva', 'figma', 'dribbble', 'behance', 'adobe', 'sketch', 'invision', 'miro', 'framer', 'webflow', 'spline', 'pixlr', 'photopea'],
+    'Google Office': ['docs.google', 'sheets.google', 'slides.google', 'forms.google', 'drive.google', 'calendar.google', 'meet.google', 'gmail', 'google.com/drive', 'google.com/docs', 'google.com/spreadsheets', 'google.com/presentation', 'google.com/forms', 'keep.google', 'sites.google', 'jamboard.google', 'mail.google.com', 'mail.google', 'translate.google', 'translate.google.com'],
+    'Productivity': ['notion', 'trello', 'asana', 'monday', 'slack', 'todoist', 'evernote', 'dropbox', 'google drive', 'onedrive', 'airtable', 'clickup'],
+    'News & Media': ['medium', 'substack', 'bbc', 'cnn', 'reuters', 'bloomberg', 'techcrunch', 'theverge', 'wired', 'hackernews'],
+    'Education': ['coursera', 'udemy', 'khan academy', 'edx', 'skillshare', 'duolingo', 'codecademy', 'freecodecamp', 'udacity'],
+    'Entertainment': ['spotify', 'soundcloud', 'apple music', 'steam', 'epicgames', 'chess.com', 'lichess', 'itch.io'],
+    'Finance': ['paypal', 'stripe', 'wise', 'revolut', 'coinbase', 'binance', 'tradingview', 'yahoo finance']
 };
 
 const COMPANY_KEYWORDS: Record<string, string[]> = {
@@ -202,6 +210,7 @@ const OperationBar: React.FC = () => {
     const [autoBackup, setAutoBackup] = useState(false);
     const [groupMenuVisible, setGroupMenuVisible] = useState(false);
     const [treeSortMenuVisible, setTreeSortMenuVisible] = useState(false);
+    const [mergeMenuVisible, setMergeMenuVisible] = useState(false);
 
     const handleToggleShowUrl = async () => {
         const newState = !setting.showUrl;
@@ -306,6 +315,127 @@ const OperationBar: React.FC = () => {
             setTreeSortMenuVisible(false);
         }
     };
+
+    const handleMergeDuplicates = () => {
+        if (!store.tree) return;
+        const root = store.tree.getRootNode();
+        let mergeCount = 0;
+
+        // Iterate over all Window nodes
+        // @ts-ignore
+        root.children?.forEach((windowNode: Fancytree.FancytreeNode) => {
+            if (windowNode.data.nodeType !== 'window' || !windowNode.children) return;
+
+            // Group by Domain
+            const domainMap = new Map<string, Fancytree.FancytreeNode[]>();
+            // Create a copy of children since we will be moving them
+            // @ts-ignore
+            const tabs = [...windowNode.children];
+
+            tabs.forEach((node) => {
+                // Check if it's a tab and has a URL (ignore sub-folders if any)
+                if (node.data.nodeType === 'tab' && node.data.url) {
+                    try {
+                        const domain = new URL(node.data.url).hostname.replace(/^www\./, '');
+                        if (!domainMap.has(domain)) {
+                            domainMap.set(domain, []);
+                        }
+                        domainMap.get(domain)!.push(node);
+                    } catch (e) {}
+                }
+            });
+
+            // Process Groups
+            domainMap.forEach((nodes) => {
+                if (nodes.length > 1) {
+                    const parent = nodes[0]; // First one is Parent
+                    const children = nodes.slice(1); // Rest are Children
+
+                    children.forEach((child) => {
+                        // Move child to be a child of parent
+                        child.moveTo(parent, 'child');
+                        mergeCount++;
+                    });
+
+                    // Set parent as folder/expandable and collapse by default
+                    parent.folder = true;
+                    parent.setExpanded(false);
+                    // Update styling or icon if needed
+                    parent.renderTitle();
+                }
+            });
+        });
+
+        if (mergeCount > 0) {
+            message.success(`Merged ${mergeCount} duplicate tabs!`);
+        } else {
+            message.info('No duplicate tabs found to merge.');
+        }
+    };
+
+    const handleUnmergeDuplicates = () => {
+        if (!store.tree) return;
+        const root = store.tree.getRootNode();
+        let unmergeCount = 0;
+
+        // Iterate all nodes
+        root.visit((node: Fancytree.FancytreeNode) => {
+             // If node is a tab and acts as a folder (has children)
+             // @ts-ignore
+             if (node.data.nodeType === 'tab' && node.children && node.children.length > 0) {
+                 // Move all children to be siblings (after the parent)
+                 // We rely on Fancytree to handle the move
+                 // @ts-ignore
+                 const children = [...node.children];
+                 // Reverse to maintain order when moving one by one after parent? 
+                 // Actually moving 'after' parent creates siblings.
+                 // Let's iterate normally and insert after, but we need to update reference point.
+                 // Easier: move all to 'child' of Window, but we need to know WHICH window.
+                 // Safer: Move 'after' the parent node one by one.
+                 
+                 let refNode = node;
+                 children.forEach(child => {
+                     child.moveTo(refNode, 'after');
+                     refNode = child; // Update refNode so next child comes after this one (maintaining order)
+                     unmergeCount++;
+                 });
+                 
+                 node.folder = false;
+                 node.setExpanded(false);
+                 node.renderTitle();
+             }
+        });
+
+        if (unmergeCount > 0) {
+            message.success(`Unmerged ${unmergeCount} tabs!`);
+        } else {
+            message.info('No merged tabs found.');
+        }
+    };
+
+    const MergeMenu = (
+        <div style={{ width: 220, padding: '8px 0' }}>
+            <div style={{ padding: '4px 12px', color: '#888', fontSize: '11px', fontWeight: 'bold' }}>
+                MERGE TABS
+            </div>
+            <div 
+                className="tab-group-menu-item"
+                onClick={handleMergeDuplicates}
+                style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+                <MergeCellsOutlined style={{ color: '#98c379' }} />
+                <span>Merge Duplicates</span>
+            </div>
+            <div 
+                 className="tab-group-menu-item"
+                 onClick={handleUnmergeDuplicates}
+                 style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+                <SplitCellsOutlined style={{ color: '#e06c75' }} />
+                <span>Unmerge All</span>
+            </div>
+        </div>
+    );
 
     const TreeSortMenu = (
         <div style={{ width: 220, padding: '8px 0' }}>
@@ -464,7 +594,13 @@ const OperationBar: React.FC = () => {
             'Shopping': 'orange',
             'Development': 'grey',
             'Chinese Apps': 'pink',
-            'Design': 'purple'
+            'Design': 'purple',
+            'Google Office': 'blue',
+            'Productivity': 'orange',
+            'News & Media': 'grey',
+            'Education': 'cyan',
+            'Entertainment': 'purple',
+            'Finance': 'green'
         };
 
         tabs.forEach((tab) => {
@@ -479,7 +615,13 @@ const OperationBar: React.FC = () => {
                                      type === 'Shopping' ? '🛒' :
                                      type === 'Development' ? '💻' :
                                      type === 'Chinese Apps' ? '🇨🇳' :
-                                     type === 'Design' ? '🎨' : '📁';
+                                     type === 'Design' ? '🎨' :
+                                     type === 'Google Office' ? '📄' :
+                                     type === 'Productivity' ? '✅' :
+                                     type === 'News & Media' ? '📰' :
+                                     type === 'Education' ? '🎓' :
+                                     type === 'Entertainment' ? '🎮' :
+                                     type === 'Finance' ? '💸' : '📁';
                         const groupName = `${emoji} ${type}`;
                         if (!groups[groupName]) {
                             groups[groupName] = { tabIds: [], color: TYPE_COLORS[type] || 'grey' };
@@ -806,6 +948,22 @@ const OperationBar: React.FC = () => {
                     <CloudUploadOutlined />
                 </div>
             </Tooltip>
+
+             <Popover
+                content={MergeMenu}
+                title="Merge Options"
+                trigger="click"
+                placement="bottomLeft"
+                open={mergeMenuVisible}
+                onOpenChange={setMergeMenuVisible}
+                showArrow={false}
+            >
+                <Tooltip title="Merge Duplicates" showArrow={false} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    <div className={'operation-bar-item'}>
+                        <MergeCellsOutlined />
+                    </div>
+                </Tooltip>
+            </Popover>
 
              <Popover
                 content={TreeSortMenu}
