@@ -1,0 +1,47 @@
+@import url('../../../styles/common.less');
+
+.search-input {
+    display: flex;
+    height: 30px;
+    padding: 0 8px;
+    line-height: 30px;
+    vertical-align: middle;
+    background-color: var(--search-input-bg-color);
+    border: 1px solid var(--search-input-border-color);
+    border-radius: 4px;
+    .clearfix();
+
+    i.icon-search {
+        position: relative;
+        color: var(--search-input-icon-color);
+    }
+
+    input.search {
+        flex: 1;
+        min-width: 0;
+        height: 30px;
+        padding-left: 10px;
+        margin: 0;
+        font-size: 12px;
+        color: var(--search-input-font-color);
+        background-color: transparent;
+        border-style: none;
+        outline: 0;
+
+        &::placeholder {
+            color: var(--search-input-placeholder-color);
+        }
+    }
+
+    &:hover {
+        border-color: var(--search-input-border-hover-color);
+    }
+
+    &.focus {
+        border-color: var(--search-input-border-focus-color);
+    }
+
+    .search-shortcut-info {
+        color: var(--search-input-placeholder-color);
+    }
+}

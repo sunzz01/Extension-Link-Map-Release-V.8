@@ -1,0 +1,582 @@
+@import url('../../../styles/common.less');
+
+body {
+    position: relative;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-family);
+    background-color: var(--content-bg-color);
+
+    #root {
+        height: 100%;
+    }
+
+    .app {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+            background-color: var(--main-bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            display: none;
+            background-color: var(--scrollbar-bgc);
+            border: 1px solid var(--scrollbar-border);
+            border-radius: 50px;
+        }
+
+        ::-webkit-scrollbar-corner {
+            background-color: var(--main-bg-color);
+        }
+    }
+
+    #header {
+        top: 0;
+        z-index: 9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 60px;
+        background: var(--header-bg-color);
+        border-bottom: 1px solid var(--header-border-bottom-color);
+
+        .search-input {
+            flex: 1;
+            margin: 0 15px;
+        }
+    }
+
+    ul.fancytree-container {
+        padding: 8px 0 50px 8px;
+        background-color: var(--content-bg-color);
+        border: 0;
+        outline: 0;
+    }
+
+    .tree-container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        height: calc(100% - 50px - 40px);
+
+        &:hover ::-webkit-scrollbar-thumb {
+            display: block;
+        }
+
+        #tree {
+            flex: 1;
+            height: 0;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+    }
+
+    #footer {
+        bottom: 0;
+        z-index: 9;
+        display: none;
+        width: 100%;
+        height: 50px;
+        background: var(--footer-bg-color);
+        border-top: 1px solid var(--footer-border-top-color);
+    }
+
+    .search-result();
+
+    #tree {
+        ul.fancytree-container {
+            li {
+                background: 0;
+            }
+
+            ul {
+                padding-left: 20px;
+            }
+        }
+
+        // --- Tree Lines (Refined Box Layout) ---
+        
+        // 1. Root Container Padding (Fix for "Window to Window" line overflow)
+        // Ensure there is space on the left for the root level lines
+        &.fancytree-container {
+            padding-left: 18px !important; // create gutter for root lines
+        }
+
+        // 2. Connector Lines Logic
+        ul {
+            padding-left: 24px; // Indentation per level
+            margin: 0;
+        }
+
+        li {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            
+            // Vertical Spine
+            &::before {
+                content: '';
+                position: absolute;
+                left: -12px; // Position exactly mid-way of the 24px padding
+                top: 0;
+                bottom: 0;
+                width: 1px;
+                background-color: var(--indent-line-color);
+                z-index: 1;
+            }
+
+            // Horizontal Branch
+            &::after {
+                content: '';
+                position: absolute;
+                left: -12px; // Start at spine
+                top: 11px;   // Center height
+                width: 16px; // Extend to touch the Expander box (at 4px margin)
+                height: 1px;
+                background-color: var(--indent-line-color);
+                z-index: 1;
+            }
+
+            // Last Child L-Shape
+            &:last-child::before {
+                height: 12px; // Half height + 1px
+                bottom: auto;
+            }
+        }
+
+        li.fancytree-animating {
+            position: inherit;
+        }
+
+        .button-group-style();
+
+        span.fancytree-node {
+            position: relative;
+            display: inline-block;
+            margin-top: 0;
+            line-height: 22px;
+            padding-left: 4px; // Gap between horizontal line end and Expander
+
+            // Fix z-index to sit above lines
+            z-index: 2;
+
+            .expander-style();
+            #fancytree-title-style();
+            .fancytree-active-style();
+
+            &.tab-active {
+                .tab-active-style();
+            }
+
+            &.fancytree-focused span.fancytree-title {
+                background: 0;
+                outline: 0;
+            }
+
+            .edit-input();
+        }
+
+        .icon-style();
+    }
+}
+
+.search-result {
+    #tree.fancytree-ext-filter-dimm span.fancytree-node {
+        &.fancytree-submatch span.fancytree-title {
+            //color: var(--title-submatch-color);
+        }
+
+        &.fancytree-match span.fancytree-title {
+            font-weight: normal;
+            //color: var(--title-match-color);
+        }
+
+        &.fancytree-hide span.fancytree-title {
+            font-weight: normal;
+            //color: var(--title-mismatch-color);
+        }
+    }
+
+    #tree.fancytree-ext-filter-hide span.fancytree-node.fancytree-hide {
+        display: none;
+    }
+
+    mark {
+        color: #f2f2f2;
+        background-color: #ccb703ad;
+    }
+}
+
+.expander-style {
+    // 3. New Unicode Expander ▣
+    span.fancytree-expander {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        vertical-align: middle;
+        
+        // Remove Box Styling
+        border: none;
+        background-color: transparent; 
+        background-image: none !important; // Remove any default sprite/icon
+        
+        margin-right: 4px;
+        line-height: 16px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.5); // Dim color
+        font-size: 14px !important; // Size for the unicode char
+        
+        transition: all 0.1s ease;
+        z-index: 10;
+        
+        &:hover {
+             color: var(--primary-color);
+             cursor: pointer;
+        }
+    }
+
+    // Explicitly hide old Pseudo-elements content used for lines
+    span.fancytree-expander::after {
+        content: ''; 
+        display: none;
+    }
+
+    // --- Expander Icons (Unicode) ---
+    
+    // Collapsed: ▣ (White Square Containing Black Small Square)
+    &.fancytree-exp-c span.fancytree-expander::before,
+    &.fancytree-exp-cl span.fancytree-expander::before {
+        content: '\25A3'; // ▣
+        display: block;
+    }
+
+    // Expanded: ⊟ (Squared Minus) - To show it's open
+    // Or if user wants ▣ for both? Let's assume standard behavior first, 
+    // but user specific request was simply "Use \25A3". 
+    // I will use ▣ for Collapsed, and maybe ⊟ for Expanded to differ?
+    // Let's stick to ▣ for collapsed as requested. For expanded let's use ⊟ (\229F) or ⊡ (\22A1).
+    // Let's use ⊟ as it matches the "minus/collapse" action.
+    &.fancytree-exp-e span.fancytree-expander::before,
+    &.fancytree-exp-el span.fancytree-expander::before {
+        content: '\25A3'; // ▣
+        display: block;
+    }
+    
+    // Leaf Nodes (No Children): Just dot or blank? 
+    // Let's use a small dot or empty square ▢ (\25A2) implies empty?
+    &.fancytree-exp-n span.fancytree-expander::before,
+    &.fancytree-exp-nl span.fancytree-expander::before {
+        content: '\25A2'; // ▢ (White Square with rounded corners - slightly lighter)
+        // Or simply opacity 0.3
+        opacity: 0.3;
+        display: block;
+        font-size: 12px;
+    }
+}
+
+.icon-style {
+    span.fancytree-node {
+        span.fancytree-custom-icon {
+            line-height: 16px;
+            text-align: center;
+
+            .fancytree-icon {
+                margin-left: 0;
+            }
+        }
+
+        &.closed {
+            .fancytree-icon {
+                filter: grayscale(1);
+            }
+        }
+
+        i.fancytree-icon.note {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: rgb(34 190 107);
+            border-radius: 4px;
+        }
+
+        .fancytree-icon {
+            vertical-align: middle;
+        }
+
+        img.fancytree-icon {
+            background-color: var(--icon-bg-color);
+            border: 1px solid var(--icon-border-color);
+            border-radius: 3px;
+        }
+
+        &.saved::before {
+            position: absolute;
+            top: 10px;
+            left: 32px;
+            z-index: 1;
+            font-family: iconfont, serif !important;
+            font-size: 12px;
+            color: #c5c5c5;
+            content: '\e69e';
+        }
+    }
+}
+
+#fancytree-title-style {
+    span.fancytree-title {
+        padding: 0 5px;
+        margin-left: 5px;
+        font-size: 13px;
+        color: var(--title-color);
+
+        .zt-node-title {
+            display: inline-block;
+            white-space: nowrap;
+            vertical-align: middle;
+
+            &.alias {
+                color: var(--title-with-alias-color);
+            }
+        }
+
+        .zt-node.closed {
+            .zt-node-alias {
+                color: var(--alias-closed-color);
+            }
+
+            .zt-node-title {
+                font-weight: normal;
+                color: var(--title-closed-color);
+
+                &.alias {
+                    color: var(--title-closed-color);
+                }
+            }
+        }
+
+        &:hover {
+            //color: #e1e4e8;
+            background-color: var(--title-hover-bg-color);
+            border-radius: 4px;
+        }
+
+        .zt-node-splitter {
+            color: var(--splitter-color);
+        }
+
+        span.zt-node-alias {
+            vertical-align: middle;
+        }
+    }
+}
+
+.tab-active-style {
+    .fancytree-title {
+        //font-weight: bold;
+        color: var(--title-tab-active-color) !important;
+    }
+
+    .zt-node-title.alias {
+        color: var(--title-with-alias-tab-active-color) !important;
+    }
+}
+
+// Define Flash Animation
+@keyframes flash-highlight {
+    0% { background-color: var(--primary-color); box-shadow: 0 0 10px var(--primary-color); }
+    50% { background-color: var(--title-active-bg-color); box-shadow: none; }
+    100% { background-color: var(--title-active-bg-color); }
+}
+
+.fancytree-active-style {
+    &.fancytree-active {
+        &.tab-active {
+            .tab-active-style();
+        }
+
+        span.fancytree-title {
+            color: var(--title-select-color) !important;
+            background-color: var(--title-active-bg-color) !important;
+            border-radius: 3px;
+            outline: 0;
+            
+            // Highlight Enhancement
+            border: 1px solid var(--primary-color); // Add border to make it distinct
+            font-weight: bold;
+            
+            // Animation when activated
+            animation: flash-highlight 1s ease-out;
+        }
+    }
+}
+
+.button-group-style {
+    span.fancytree-node {
+        .zt-node-button-group {
+            position: absolute;
+            top: 0;
+            right: 0;
+            box-sizing: border-box;
+            display: none;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            height: 22px;
+            font-weight: normal;
+            line-height: 22px;
+            background-color: var(--button-group-bg-color);
+            border-radius: 3px;
+            box-shadow: 0 0 3px var(--button-group-shadow-color);
+
+            .zt-node-btn {
+                box-sizing: border-box;
+                flex: 1;
+                width: 22px;
+                height: 100%;
+                padding: 0 2px;
+                font-size: 12px;
+                color: var(--button-group-icon-color);
+                text-align: center;
+                vertical-align: middle;
+                cursor: pointer;
+                border-right: 1px solid var(--button-group-splitter-color);
+
+                &:hover {
+                    color: var(--button-group-hover-color);
+                    background-color: var(--button-group-hover-bg-color);
+                }
+
+                &:last-child {
+                    border-right: none;
+                }
+            }
+        }
+
+        &:hover {
+            .zt-node-button-group {
+                display: flex;
+            }
+        }
+    }
+}
+
+.edit-input {
+    .fancytree-title {
+        .fancytree-edit-input {
+            box-sizing: border-box;
+            min-width: 100px;
+            max-width: 150px;
+            padding: 2px 5px;
+            font-size: var(--main-font-size);
+            color: var(--main-font-color);
+            background-color: transparent;
+            border: 1px solid var(--main-border-color);
+            border-radius: 4px;
+            outline: 0;
+            box-shadow: none;
+        }
+    }
+}
+
+.context-menu-list {
+    padding: 8px 4px;
+    background-color: var(--ctx-menu-bg-color);
+    border-color: var(--ctx-menu-border-color);
+    border-radius: 8px;
+    box-shadow: 0 1px #0000000d, 0 4px 10px rgb(0 0 0 / 30%);
+
+    .context-menu-item {
+        font-family: var(--font-family) !important;
+        font-size: var(--main-font-size);
+        color: var(--ctx-menu-font-color);
+        background-color: transparent;
+        border-radius: 4px;
+
+        &.context-menu-hover {
+            background-color: var(--ctx-menu-hover-bg-color);
+        }
+    }
+
+    .context-menu-submenu::after {
+        border-color: transparent transparent transparent var(--main-font-color);
+        border-width: 0.4em 0 0.4em 0.4em;
+    }
+
+    .context-menu-icon::before {
+        font-family: iconfont, serif;
+        color: var(--ctx-menu-font-color);
+    }
+}
+
+#fancytree-drop-marker {
+    color: var(--primary-color);
+    background: none;
+}
+
+// --- Audio Indicator Style ---
+.audio-indicator {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 16px;
+    margin-right: 5px;
+    vertical-align: middle;
+    cursor: pointer;
+    color: var(--primary-color);
+    transition: all 0.2s ease;
+    z-index: 5; // Ensure clickable
+
+    .speaker-icon {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+    }
+
+    // Animation for active audio
+    &:not(.muted) {
+        .speaker-icon {
+            animation: speaker-pulse 1.2s infinite ease-in-out;
+        }
+    }
+
+    // Muted State
+    &.muted {
+        color: #7d7d7d; // Dimmed color
+        
+        .speaker-icon {
+             opacity: 0.7;
+        }
+        
+        // Strike-through line for mute
+        &::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 1.5px;
+            background-color: currentColor;
+            transform: rotate(-45deg);
+            top: 7px;
+            left: 2px;
+        }
+    }
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes speaker-pulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}

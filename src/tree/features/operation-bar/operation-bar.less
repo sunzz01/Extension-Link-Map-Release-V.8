@@ -1,0 +1,99 @@
+.operation-bar {
+    display: flex;
+    padding: 5px;
+    border-bottom: 1px solid var(--header-border-bottom-color);
+
+    .operation-bar-item {
+        width: 18px;
+        height: 18px;
+        padding: 3px;
+        margin-right: 5px;
+        line-height: 18px;
+        color: var(--btn-font-color);
+        text-align: center;
+        //border: 1px solid #a3a3a3;
+        cursor: pointer;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: var(--btn-hover-bg-color);
+        }
+    }
+}
+
+// Tab Group Menu Popover Styling
+.ant-popover {
+    .ant-popover-inner {
+        background-color: var(--main-bg-color) !important;
+        border: 1px solid var(--main-border-color) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    .ant-popover-title {
+        color: var(--main-font-color) !important;
+        border-bottom: 1px solid var(--main-border-color) !important;
+        font-weight: 600;
+    }
+    
+    .ant-popover-inner-content {
+        padding: 4px 0 !important;
+    }
+}
+
+// Ant Design Menu inside Popover
+.ant-menu {
+    background: transparent !important;
+    border: none !important;
+    
+    .ant-menu-item-group-title {
+        color: #888 !important;
+        font-size: 11px !important;
+        font-weight: bold !important;
+        padding: 8px 16px 4px !important;
+    }
+    
+    .ant-menu-item {
+        color: var(--main-font-color) !important;
+        margin: 2px 4px !important;
+        border-radius: 4px !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        
+        &:hover {
+            background-color: var(--btn-hover-bg-color) !important;
+            color: #fff !important;
+        }
+        
+        &.ant-menu-item-disabled {
+            color: #666 !important;
+            cursor: default !important;
+            background: transparent !important;
+            
+            &:hover {
+                background: transparent !important;
+            }
+        }
+        
+        .anticon {
+            color: var(--primary-color) !important;
+        }
+    }
+    
+    .ant-menu-item-divider {
+        background-color: var(--main-border-color) !important;
+        margin: 8px 12px !important;
+    }
+}
+
+// Custom Tab Group Menu Items
+.tab-group-menu-item {
+    color: var(--main-font-color);
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+    margin: 2px 8px;
+    
+    &:hover {
+        background-color: var(--btn-hover-bg-color);
+    }
+}

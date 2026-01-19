@@ -1,0 +1,266 @@
+{
+    "extDesc": {
+        "message": "⭐Link Map - 专业标签管理工具，构建自己的链接收藏夹"
+    },
+    "search": {
+        "message": "搜索"
+    },
+    "settings": {
+        "message": "设置"
+    },
+    "settingsImportExport": {
+        "message": "备份和恢复"
+    },
+    "exportLinkMapData": {
+        "message": "导出数据"
+    },
+    "importLinkMapData": {
+        "message": "导入数据"
+    },
+    "importTabOutlinerData": {
+        "message": "导入TabOutliner数据"
+    },
+    "feedback": {
+        "message": "反馈"
+    },
+    "feedbackDesc": {
+        "message": "反馈关于LinkMap的建议/问题"
+    },
+    "ctxMenuEdit": {
+        "message": "编辑"
+    },
+    "ctxMenuDelete": {
+        "message": "删除"
+    },
+    "ctxMenuClose": {
+        "message": "关闭并保存"
+    },
+    "ctxMenuCopy": {
+        "message": "复制"
+    },
+    "ctxMenuCopyLink": {
+        "message": "复制链接"
+    },
+    "ctxMenuCopyMarkDownLink": {
+        "message": "复制Markdown链接"
+    },
+    "ctxMenuNotes": {
+        "message": "笔记"
+    },
+    "ctxMenuNotesCreateAsParent": {
+        "message": "作为父节点"
+    },
+    "ctxMenuNotesCreateAsFirstSubNode": {
+        "message": "作为第一个子节点"
+    },
+    "ctxMenuNotesCreateAsLastSubNode": {
+        "message": "作为最后一个子节点"
+    },
+    "ctxMenuNotesCreateAfter": {
+        "message": "作为下一个节点(仅对笔记节点生效)"
+    },
+    "importPageInfo": {
+        "message": "根据需要将下面的节点拖拽到LinkMap中就可以完成数据导入"
+    },
+    "importPageExportTime": {
+        "message": "备份时间"
+    },
+    "welcomeTitle": {
+        "message": "欢迎使用Link Map！"
+    },
+    "welcomeIntro": {
+        "message": "Link Map是一个浏览器扩展，用来帮助你管理你的标签和构建链接收藏。"
+    },
+    "welcomeIntro2": {
+        "message": "现在Link Map还处于早期版本，有任何问题可以联系我们，更多新功能正在开发中。"
+    },
+    "welcomeIntro3": {
+        "message": "现在我们准备了一些小技巧来帮助你快速上手。"
+    },
+    "welcomeIntro4": {
+        "message": "你可以关闭这个弹窗，跟随'\uD83D\uDE80 小技巧'节点的指引来试一试。"
+    },
+    "tipsTitle": {
+        "message": "小技巧"
+    },
+    "tipsDnd": {
+        "message": "用鼠标拖拽这里，可以重新安排节点和Tab的顺序"
+    },
+    "tipsHover": {
+        "message": "鼠标悬停在这里，在右侧会显示快捷按钮"
+    },
+    "tipsEdit": {
+        "message": "点击'编辑'按钮可以重命名节点"
+    },
+    "tipsDelete": {
+        "message": "点击'删除'按钮可以删除节点"
+    },
+    "tipsDeleteAll": {
+        "message": "收起所有节点，点击'删除'按钮可以删除所有节点"
+    },
+    "tipsDeleteAllSample": {
+        "message": "默默等待删除"
+    },
+    "tipsRClick": {
+        "message": "右键点击这里，可以进行更多操作"
+    },
+    "tipsSearch": {
+        "message": "尝试在搜索框中输入关键字，可以快速定位到你想要的节点"
+    },
+    "tipsSettings": {
+        "message": "在设置中可以备份或恢复数据"
+    },
+    "tipsFeedback1": {
+        "message": "非常欢迎你的反馈"
+    },
+    "tipsFeedback2": {
+        "message": "在设置中可以反馈问题"
+    },
+    "tipsFinish": {
+        "message": "完成！可以删除这些节点并开始使用！"
+    },
+    "appearance": {
+        "message": "外观"
+    },
+    "theme": {
+        "message": "主题"
+    },
+    "themeAuto": {
+        "message": "跟随系统"
+    },
+    "themeLight": {
+        "message": "明亮模式"
+    },
+    "themeDark": {
+        "message": "黑暗模式"
+    },
+    "commandTriggerLinkMap": {
+        "message": "打开Link Map"
+    },
+    "commandUnset": {
+        "message": "未设置"
+    },
+    "goToPreviousNode": {
+        "message": "选中前一个节点"
+    },
+    "goToNextNode": {
+        "message": "选中后一个节点"
+    },
+    "goToParentNode": {
+        "message": "选中父节点"
+    },
+    "expand": {
+        "message": "展开"
+    },
+    "collapse": {
+        "message": "收起"
+    },
+    "basicOperation": {
+        "message": "基本操作"
+    },
+    "navigation": {
+        "message": "导航"
+    },
+    "shortcut": {
+        "message": "快捷键"
+    },
+    "updateNoteTitle": {
+        "message": "Link Map感觉自己更强大了！"
+    },
+    "updateNoteContent": {
+        "message": "在v1.0.10版本中，增加了一些小的改进，可以更细粒度的控制Link Map的行为。如果你感兴趣，只需查看树中的第一个节点来获取细节"
+    },
+    "updateTutorialNode": {
+        "message": "v1.0.10中的新功能"
+    },
+    "updateTutorialFeature1": {
+        "message": "选项：就在'展开全部'按钮旁边"
+    },
+    "updateTutorialFeature1Desc1": {
+        "message": "自动滚动到激活的标签"
+    },
+    "updateTutorialFeature1Desc11": {
+        "message": "启用：切换标签时，树将自动滚动到激活的标签节点，并使其可见"
+    },
+    "updateTutorialFeature1Desc12": {
+        "message": "禁用：树啥也不做，就那么呆着"
+    },
+    "updateTutorialFeature1Desc2": {
+        "message": "根据层级创建新标签"
+    },
+    "updateTutorialFeature1Desc21": {
+        "message": "启用：如果从最后一个标签创建的空标签页，新标签页会作为子节点创建"
+    },
+    "updateTutorialFeature1Desc22": {
+        "message": "禁用：新标签将始终作为窗口的最后一个子节点创建"
+    },
+    "updateTutorialFeature1Desc23": {
+        "message": "我的描述可能会让你感到困惑，请尝试一下"
+    },
+    "updateTutorialFeature2": {
+        "message": "将子树复制为TXT/Markdown：功能在右键下拉菜单中"
+    },
+    "updateTutorialFeature2Desc1": {
+        "message": "将链接复制到笔记应用程序中时很有用"
+    },
+    "updateTutorialFeature3": {
+        "message": "'定位标签节点'优化"
+    },
+    "updateTutorialFeature3Desc1": {
+        "message": "现在它只会定位顶级窗口中处于激活状态的标签"
+    },
+    "updateTutorialFeature3Desc2": {
+        "message": "它仍然不完美，有时会有问题，我将继续优化"
+    },
+    "reviewLinkMap": {
+        "message": "Link Map有没有帮到你或者有什么想吐槽的？"
+    },
+    "reviewLinkMapDesc": {
+        "message": "双击这个节点"
+    },
+    "reviewLinkMapDesc2": {
+        "message": "给Link Map评分"
+    },
+    "locate": {
+        "message": "定位标签节点"
+    },
+    "collapseAll": {
+        "message": "收起全部"
+    },
+    "expandAll": {
+        "message": "展开全部"
+    },
+    "activeOrOpen": {
+        "message": "激活/打开"
+    },
+    "save": {
+        "message": "保存"
+    },
+    "copySubtreeAsText": {
+        "message": "复制全部为txt"
+    },
+    "copySubtreeAsMarkdown": {
+        "message": "复制全部为Markdown"
+    },
+    "options": {
+        "message": "选项"
+    },
+    "autoScrollToActiveTab": {
+        "message": "自动滚动到激活的标签"
+    },
+    "createNewTabByLevel": {
+        "message": "根据层级创建新标签"
+    },
+    "deleteNode": {
+        "message": "删除节点"
+    },
+    "deleteSubtree": {
+        "message": "删除子树"
+    },
+    "closeNode": {
+        "message": "关闭节点"
+    },
+    "closeSubtree": {
+        "message": "关闭子树"
+    }
+}
