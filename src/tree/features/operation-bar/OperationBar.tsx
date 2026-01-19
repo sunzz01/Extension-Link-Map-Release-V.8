@@ -195,12 +195,27 @@ const OperationBar: React.FC = () => {
     const { setting, setSetting } = useContext(SettingContext);
     const [autoBackup, setAutoBackup] = useState(false);
     const [groupMenuVisible, setGroupMenuVisible] = useState(false);
+    const [treeSortMenuVisible, setTreeSortMenuVisible] = useState(false);
 
     const handleToggleShowUrl = async () => {
         const newState = !setting.showUrl;
         await store.db.updateSettingPartial({ showUrl: newState });
         setSetting({ ...setting, showUrl: newState });
         message.success(`${newState ? 'Show' : 'Hide'} URL`);
+    };
+
+    const handleArchive = async () => {
+        if (!store.tree) return;
+        const data = store.tree.toDict();
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `link-map-archive-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        message.success('Archive downloaded');
     };
 
     useEffect(() => {
@@ -218,6 +233,133 @@ const OperationBar: React.FC = () => {
             if (interval) clearInterval(interval);
         };
     }, [autoBackup]);
+
+    const handleTreeSortByTitle = () => {
+        if (store.tree) {
+            const ftree = store.tree;
+            // @ts-ignore
+            ftree.getRootNode().visit((node: Fancytree.FancytreeNode) => {
+                if (node.data.nodeType === 'window') {
+                    // @ts-ignore
+                    node.sortChildren((a: Fancytree.FancytreeNode, b: Fancytree.FancytreeNode) => {
+                        const titleA = a.title.toLowerCase();
+                        const titleB = b.title.toLowerCase();
+                        if (titleA < titleB) return -1;
+                        if (titleA > titleB) return 1;
+                        return 0;
+                    }, false);
+                }
+                return true;
+            });
+            message.success('Tree sorted by Title');
+            setTreeSortMenuVisible(false);
+        }
+    };
+
+    const handleTreeSortByDomain = () => {
+        if (store.tree) {
+            const ftree = store.tree;
+            // @ts-ignore
+            ftree.getRootNode().visit((node: Fancytree.FancytreeNode) => {
+                if (node.data.nodeType === 'window') {
+                    // @ts-ignore
+                    node.sortChildren((a: Fancytree.FancytreeNode, b: Fancytree.FancytreeNode) => {
+                        const getDomain = (n: any) => {
+                            try { return new URL(n.data.url).hostname; } catch(e) { return ''; }
+                        };
+                        const domainA = getDomain(a);
+                        const domainB = getDomain(b);
+                        if (domainA < domainB) return -1;
+                        if (domainA > domainB) return 1;
+                        return 0;
+                    }, false);
+                }
+                return true;
+            });
+            message.success('Tree sorted by Domain');
+            setTreeSortMenuVisible(false);
+        }
+    };
+    
+    // Sort by Tab ID (effectively creation order/default)
+    const handleTreeSortDefault = () => {
+        if (store.tree) {
+            const ftree = store.tree;
+            // @ts-ignore
+            ftree.getRootNode().visit((node: Fancytree.FancytreeNode) => {
+                if (node.data.nodeType === 'window') {
+                    // @ts-ignore
+                    node.sortChildren((a: Fancytree.FancytreeNode, b: Fancytree.FancytreeNode) => {
+                         // Fallback to key/id comparison which usually reflects creation order in this app
+                         return Number(a.key) - Number(b.key);
+                    }, false);
+                }
+                return true;
+            });
+            message.success('Tree sorted by Default (Creation Order)');
+            setTreeSortMenuVisible(false);
+        }
+    };
+
+    const TreeSortMenu = (
+        <div style={{ width: 220, padding: '8px 0' }}>
+            <div style={{ padding: '4px 12px', color: '#888', fontSize: '11px', fontWeight: 'bold' }}>
+                TREE SORT (VISUAL ONLY)
+            </div>
+            <div 
+                className="tab-group-menu-item"
+                onClick={handleTreeSortByDomain}
+                style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+                <GlobalOutlined style={{ color: '#61afef' }} />
+                <span>Sort by Domain</span>
+            </div>
+            <div 
+                className="tab-group-menu-item"
+                onClick={handleTreeSortByTitle}
+                style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+                <span style={{ fontSize: '14px', width: '14px', textAlign: 'center', color: '#61afef' }}>A</span>
+                <span>Sort by Title</span>
+            </div>
+            <div 
+                 className="tab-group-menu-item"
+                 onClick={handleTreeSortDefault}
+                 style={{ padding: '8px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+                <span style={{ fontSize: '14px', width: '14px', textAlign: 'center', color: '#61afef' }}>↩️</span>
+                <span>Reset Sort (Default)</span>
+            </div>
+        </div>
+    );
+
+    const handleSync = () => {
+        message.loading({ content: 'Syncing with Web Driver...', key: 'sync' });
+        setTimeout(() => {
+            message.success({ content: 'Web Driver Sync Complete!', key: 'sync' });
+        }, 1500);
+    };
+
+    const handleSidePanel = async () => {
+        // @ts-ignore
+        if (chrome.sidePanel && chrome.sidePanel.open) {
+            try {
+                const window = await browser.windows.getCurrent();
+                if (window.id) {
+                    // @ts-ignore
+                    await chrome.sidePanel.open({ windowId: window.id });
+                }
+            } catch (error: any) {
+                 if (error.message && error.message.includes('user gesture')) {
+                    message.warning('Click extension icon for Side Panel');
+                 } else {
+                    message.error('Side Panel Error: ' + error.message);
+                 }
+            }
+        } else {
+            message.info('Side Panel API requires Chrome 114+');
+        }
+    };
 
     // Connect Logic to Chrome Tab Groups API
     const createGroups = async (groups: Record<string, { tabIds: number[]; color?: string }>) => {
@@ -611,49 +753,6 @@ const OperationBar: React.FC = () => {
         </div>
     );
 
-    const handleArchive = () => {
-        const data = store.tree?.toDict();
-        if (data) {
-            const dateStr = new Date().toISOString().replace(/[:.]/g, '-');
-            const key = `archive-${dateStr}`;
-            localStorage.setItem(key, JSON.stringify(data));
-            message.success('Session Archived: ' + dateStr);
-        }
-    };
-
-    const handleGroupRules = () => {
-        message.info('Group By Rules applied: Tree sorted by rules.');
-        // Implement complex tree sorting here if requested
-    };
-
-    const handleSync = () => {
-        message.loading({ content: 'Syncing with Web Driver...', key: 'sync' });
-        setTimeout(() => {
-            message.success({ content: 'Web Driver Sync Complete!', key: 'sync' });
-        }, 1500);
-    };
-
-    const handleSidePanel = async () => {
-        // @ts-ignore
-        if (chrome.sidePanel && chrome.sidePanel.open) {
-            try {
-                const window = await browser.windows.getCurrent();
-                if (window.id) {
-                    // @ts-ignore
-                    await chrome.sidePanel.open({ windowId: window.id });
-                }
-            } catch (error: any) {
-                 if (error.message && error.message.includes('user gesture')) {
-                    message.warning('Click extension icon for Side Panel');
-                 } else {
-                    message.error('Side Panel Error: ' + error.message);
-                 }
-            }
-        } else {
-            message.info('Side Panel API requires Chrome 114+');
-        }
-    };
-
     return (
         <div className={'operation-bar'}>
             <Popover
@@ -698,11 +797,21 @@ const OperationBar: React.FC = () => {
                 </div>
             </Tooltip>
 
-             <Tooltip title="Group By Rules (Tree Sort)" showArrow={false}>
-                <div className={'operation-bar-item'} onClick={handleGroupRules}>
-                    <PartitionOutlined />
-                </div>
-            </Tooltip>
+             <Popover
+                content={TreeSortMenu}
+                title="Tree Sort Options"
+                trigger="click"
+                placement="bottomLeft"
+                open={treeSortMenuVisible}
+                onOpenChange={setTreeSortMenuVisible}
+                showArrow={false}
+            >
+                <Tooltip title="Tree Sort (Visual)" showArrow={false} getPopupContainer={(trigger) => trigger.parentElement!}>
+                    <div className={'operation-bar-item'}>
+                        <PartitionOutlined />
+                    </div>
+                </Tooltip>
+            </Popover>
 
             <Tooltip title="Web Driver Sync" showArrow={false}>
                 <div className={'operation-bar-item'} onClick={handleSync}>
